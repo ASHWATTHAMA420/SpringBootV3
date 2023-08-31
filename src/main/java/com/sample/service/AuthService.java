@@ -26,17 +26,19 @@ public class AuthService {
     @Autowired
     private AuthenticationManager authenticationManager;
 
+    public String token = null;
+
     public AuthResponse login(LoginRequest request) {
     authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
     User user = userRepo.findByEmail(request.getEmail()).orElseThrow(() -> new UsernameNotFoundException("User not found with email = " + request.getEmail()));
-    String token = jwtService.generateToken(user);
+    token = jwtService.generateToken(user);
     return AuthResponse.builder().token(token).build();
     }
 
     public AuthResponse signup(SignupRequest request) {
     User user = new User(request.getFirstname(), request.getLastname(), request.getEmail(), passwordEncoder.encode(request.getPassword()), request.getRole());
     userRepo.save(user);
-    String token = jwtService.generateToken(user);
+    token = jwtService.generateToken(user);
     return AuthResponse.builder().token(token).build();
     }
 }
